@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:app_onboarding/data/data.dart';
 import 'package:app_onboarding/data/main.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Home(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -21,17 +23,29 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
   List<SliderModel> mySLides = new List<SliderModel>();
   int slideIndex = 0;
+  PageController controller;
 
-  PageController _controller;
+  Widget _buildPageIndicator(bool isCurrentPage){
+    return Container(
+     margin: EdgeInsets.symmetric(horizontal: 2.0),
+      height: isCurrentPage ? 10.0 : 6.0,
+      width: isCurrentPage ? 10.0 : 6.0,
+      decoration: BoxDecoration(
+        color: isCurrentPage ? Colors.grey : Colors.grey[300],
+        borderRadius: BorderRadius.circular(12),
+      ),
+    );
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     mySLides = getSlides();
-    _controller = PageController(initialPage: slideIndex);
+    controller = new PageController();
   }
 
   @override
@@ -42,98 +56,81 @@ class _HomeState extends State<Home> {
               colors: [const Color(0xff3C8CE7), const Color(0xff00EAFF)])),
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: Column(
+        body: Container(
+          height: MediaQuery.of(context).size.height - 100,
+          child: PageView(
+            controller: controller,
+              onPageChanged: (index) {
+                setState(() {
+                  slideIndex = index;
+                });
+              },
           children: <Widget>[
-            Container(
-              height: MediaQuery.of(context).size.height - 100,
-              child: PageView.builder(
-                  itemCount: mySLides.length,
-                  onPageChanged: (index) {
-                    setState(() {
-                      slideIndex = index;
-                    });
-                  },
-                  itemBuilder: (context, index) {
-                    return SlideTile(
-                      imagePath: mySLides[index].getImageAssetPath(),
-                      title: mySLides[index].getTitle(),
-                      desc: mySLides[index].getDesc(),
-                    );
-                  }),
+            SlideTile(
+              imagePath: mySLides[0].getImageAssetPath(),
+              title: mySLides[0].getTitle(),
+              desc: mySLides[0].getDesc(),
             ),
-            Spacer(),
-            Stack(
-              children: <Widget>[
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        height: 10,
-                        width: 10,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: slideIndex == 0 ? Colors.blue : Colors.grey),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        height: 10,
-                        width: 10,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: slideIndex == 1 ? Colors.blue : Colors.grey),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        height: 10,
-                        width: 10,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: slideIndex == 2 ? Colors.blue : Colors.grey),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap: () {
-                          _controller.jumpToPage(slideIndex);
-                        },
-                        child: Container(
-                            child:
-                                slideIndex == 0 ? Container() : Text("BACK")),
-                      ),
-                      Spacer(),
-                      GestureDetector(
-                          onTap: () {
-                            if (slideIndex == mySLides.length - 1) {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Main(),
-                                  ));
-                            }
-                          },
-                          child: Text(slideIndex == mySLides.length - 1
-                              ? "FINISH"
-                              : "NEXT"))
-                    ],
-                  ),
-                )
-              ],
+            SlideTile(
+              imagePath: mySLides[1].getImageAssetPath(),
+              title: mySLides[1].getTitle(),
+              desc: mySLides[1].getDesc(),
             ),
-            SizedBox(
-              height: 40,
+            SlideTile(
+              imagePath: mySLides[2].getImageAssetPath(),
+              title: mySLides[2].getTitle(),
+              desc: mySLides[2].getDesc(),
             )
           ],
+          ),
+        ),
+        bottomSheet: slideIndex != 2 ? Container(
+          margin: EdgeInsets.symmetric(vertical: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              FlatButton(
+                onPressed: (){
+                  controller.animateToPage(2, duration: Duration(milliseconds: 400), curve: Curves.linear);
+                },
+                splashColor: Colors.blue[50],
+                child: Text(
+                  "SKIP",
+                  style: TextStyle(color: Color(0xFF0074E4), fontWeight: FontWeight.w600),
+                ),
+              ),
+              Container(
+                child: Row(
+                  children: [
+                    for (int i = 0; i < 3 ; i++) i == slideIndex ? _buildPageIndicator(true): _buildPageIndicator(false),
+                  ],),
+              ),
+              FlatButton(
+                onPressed: (){
+                  print("this is slideIndex: $slideIndex");
+                  controller.animateToPage(slideIndex + 1, duration: Duration(milliseconds: 500), curve: Curves.linear);
+                },
+                splashColor: Colors.blue[50],
+                child: Text(
+                  "NEXT",
+                  style: TextStyle(color: Color(0xFF0074E4), fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
+        ): InkWell(
+          onTap: (){
+            print("Get Started Now");
+          },
+          child: Container(
+            height: Platform.isIOS ? 70 : 60,
+            color: Colors.blue,
+            alignment: Alignment.center,
+            child: Text(
+              "GET STARTED NOW",
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+            ),
+          ),
         ),
       ),
     );
@@ -148,7 +145,7 @@ class SlideTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height,
+      padding: EdgeInsets.symmetric(horizontal: 20),
       alignment: Alignment.center,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -157,86 +154,19 @@ class SlideTile extends StatelessWidget {
           SizedBox(
             height: 40,
           ),
-          Text(title),
+          Text(title, textAlign: TextAlign.center,style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 20
+          ),),
           SizedBox(
-            height: 40,
+            height: 20,
           ),
-          Text(desc)
+          Text(desc, textAlign: TextAlign.center,style: TextStyle(
+          fontWeight: FontWeight.w500,
+              fontSize: 14))
         ],
       ),
     );
   }
 }
 
-class indexIndicator extends StatelessWidget {
-  int index, length;
-
-  indexIndicator({this.index, this.length});
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Container(
-          width: MediaQuery.of(context).size.width,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                height: 10,
-                width: 10,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: index == 0 ? Colors.blue : Colors.grey),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Container(
-                height: 10,
-                width: 10,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: index == 1 ? Colors.blue : Colors.grey),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Container(
-                height: 10,
-                width: 10,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: index == 2 ? Colors.blue : Colors.grey),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            children: <Widget>[
-              GestureDetector(
-                onTap: () {},
-                child:
-                    Container(child: index == 0 ? Container() : Text("BACK")),
-              ),
-              Spacer(),
-              GestureDetector(
-                  onTap: () {
-                    if (index == length - 1) {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Main(),
-                          ));
-                    }
-                  },
-                  child: Text(index == length - 1 ? "FINISH" : "NEXT"))
-            ],
-          ),
-        )
-      ],
-    );
-  }
-}

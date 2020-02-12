@@ -47,17 +47,23 @@ List<SliderModel> getSlides(){
   sliderModel.setImageAssetPath("assets/illustration.png");
   slides.add(sliderModel);
 
+  sliderModel = new SliderModel();
+
   //2
-  sliderModel.setDesc("Discover Restaurants offering the best fast food food near you on Foodwa");
-  sliderModel.setTitle("Search");
-  sliderModel.setImageAssetPath("assets/illustration.png");
+  sliderModel.setDesc("Our veggie plan is filled with delicious seasonal vegetables, whole grains, beautiful cheeses and vegetarian proteins");
+  sliderModel.setTitle("Order");
+  sliderModel.setImageAssetPath("assets/illustration2.png");
   slides.add(sliderModel);
 
+  sliderModel = new SliderModel();
+
   //3
-  sliderModel.setDesc("Discover Restaurants offering the best fast food food near you on Foodwa");
-  sliderModel.setTitle("Search");
-  sliderModel.setImageAssetPath("assets/illustration.png");
+  sliderModel.setDesc("Food delivery or pickup from local restaurants, Explore restaurants that deliver near you.");
+  sliderModel.setTitle("Eat");
+  sliderModel.setImageAssetPath("assets/illustration3.png");
   slides.add(sliderModel);
+
+  sliderModel = new SliderModel();
 
   return slides;
 }
