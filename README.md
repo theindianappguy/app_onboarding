@@ -6,7 +6,7 @@ In this tutorial I will be showing you how to create Onboarding screen for Flutt
 
 Do ⭐ the repo it really motivates me to share more open source
 
-Full tutorial on Youtube : 
+Full tutorial on Youtube : https://youtu.be/4ECz8XSHF8c
 
 ## Show Support
 * [Recommend Me On LinkedIn](https://www.linkedin.com/in/lamsanskar/) - I will realy Appriciate this
